@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -46,7 +47,7 @@ class PostController extends Controller
         $request->validate([
             'title'=> 'required|string|unique:posts',
             'content'=> 'required|string',
-            'image'=> 'nullable|url',
+            'image'=> 'nullable|image|mimes:jpeg,jpg,png',
             'category_id'=> 'nullable|exists:categories,id',
             'tags'=> 'nullable|exists:tags,id'
         ],
@@ -55,7 +56,8 @@ class PostController extends Controller
             'title.required'=> 'Il titolo è obbligatorio',
             'content.required'=> 'Devi scrivere il contenuto del post',
             'title.unique'=> 'Esiste già un post dal titolo $request->title',
-            
+            'image.image'=> 'Il file caricato non è di tipo immagine',
+            'image.mimes'=> 'Sono ammesse solo immagini di formato: .jpeg, .jpg, .png',
             'category_id.exists'=>'Non esiste una categoria associabile',
             'tags.exists'=>'Uno dei dati indicati non è valido'
         ]);
@@ -68,8 +70,14 @@ class PostController extends Controller
 
         $post-> slug = Str::slug($post->title, '-');
 
+        if(array_key_exists('image', $data)){
+            $image_url = Storage::put('posts', $data['image']);
+            $post->image = $image_url;
+        }
+
         $post->save();
 
+        
         if(array_key_exists('tags',$data)){
             $post->tags()->attach($data['tags']);
         }
