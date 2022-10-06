@@ -1,8 +1,8 @@
 @if($post->exists)
-<form action="{{ route('admin.posts.update', $post) }}" method="POST" novalidate>
+<form action="{{ route('admin.posts.update', $post) }}" enctype="multipart/form-data" method="POST" novalidate>
     @method('PUT')
 @else
-<form action="{{ route('admin.posts.store') }}" method="POST" novalidate>
+<form action="{{ route('admin.posts.store') }}" enctype="multipart/form-data" method="POST" novalidate>
 @endif
 
      @csrf
