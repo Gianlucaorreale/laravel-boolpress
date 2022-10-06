@@ -61,9 +61,8 @@
         </div>
         <div class="col-12">
            <div class="form-group">
-               <label for="image">Immagine</label>
-               <input type="url" class="form-control" id="image" name="image" value="{{old('image', $post->image)}}"
-                >
+               <label for="image">Immagine</label><br>
+               <input type="file"  id="image" name="image">
                
            </div>
         </div>
