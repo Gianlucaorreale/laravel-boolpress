@@ -119,11 +119,37 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Post $post)
-    {
+    {   
+
+        $request->validate([
+            'title'=> 'required|string|unique:posts',
+            'content'=> 'required|string',
+            'image'=> 'nullable|image|mimes:jpeg,jpg,png',
+            'category_id'=> 'nullable|exists:categories,id',
+            'tags'=> 'nullable|exists:tags,id'
+        ],
+        
+        [
+            'title.required'=> 'Il titolo è obbligatorio',
+            'content.required'=> 'Devi scrivere il contenuto del post',
+            'title.unique'=> 'Esiste già un post dal titolo $request->title',
+            'image.image'=> 'Il file caricato non è di tipo immagine',
+            'image.mimes'=> 'Sono ammesse solo immagini di formato: .jpeg, .jpg, .png',
+            'category_id.exists'=>'Non esiste una categoria associabile',
+            'tags.exists'=>'Uno dei dati indicati non è valido'
+        ]);
+
+
         $data = $request->all();
 
      
         $data['slug'] = Str::slug($data['title'], '-');
+
+        if(array_key_exists('image', $data)){
+            if($post->image) Storage::delete($post->image);
+            $image_url = Storage::put('posts', $data['image']);
+            $post->image = $image_url;
+        }
 
         $post-> update($data);
 
